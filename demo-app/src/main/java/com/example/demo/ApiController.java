@@ -58,12 +58,7 @@ public class ApiController {
             }
             in.close();
             connection.disconnect();
-            
-            response.put("external_call", Map.of(
-                "url", url.toString(),
-                "status", responseCode,
-                "response_preview", content.substring(0, Math.min(100, content.length())) + "..."
-            ));
+
         } catch (Exception e) {
             response.put("external_call_error", e.getMessage());
         }

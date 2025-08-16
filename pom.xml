@@ -17,117 +17,173 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opentelemetry.version>1.40.0</opentelemetry.version>
-        <opentelemetry.javaagent.version>1.32.0</opentelemetry.javaagent.version>
-        <opentelemetry.instrumentation.version>1.32.0</opentelemetry.instrumentation.version>
-        <slf4j.version>1.7.36</slf4j.version>
-        <otel.version>1.32.0</otel.version>
-        <otel.instrumentation.version>1.33.0</otel.instrumentation.version>
-        <byte-buddy.version>1.14.9</byte-buddy.version>
+        <maven.compiler.release>8</maven.compiler.release>
+        <!-- Managed by .github/scripts/update-sdk-version.sh -->
+        <opentelemetry.sdk.version>1.53.0</opentelemetry.sdk.version>
+        <!-- Managed by .github/scripts/update-version.sh -->
+        <opentelemetry.javaagent.version>2.18.0</opentelemetry.javaagent.version>
+        <opentelemetry.javaagent.alpha.version>2.18.0-alpha</opentelemetry.javaagent.alpha.version>
+        <spotless.version>2.37.0</spotless.version>
+        <auto.service.version>1.1.1</auto.service.version>
+        <commons.lang3.version>3.18.0</commons.lang3.version>
+        <testcontainers.version>1.21.3</testcontainers.version>
+        <jackson.databind.version>2.19.2</jackson.databind.version>
+        <protobuf.java.util.version>4.32.0</protobuf.java.util.version>
+        <okhttp.version>5.1.0</okhttp.version>
+        <junit.jupiter.version>5.13.4</junit.jupiter.version>
+        <logback.classic.version>1.5.18</logback.classic.version>
+        <javax.servlet.api.version>3.0.1</javax.servlet.api.version>
+        <opentelemetry.proto.version>1.7.0-alpha</opentelemetry.proto.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-bom</artifactId>
+                <version>${opentelemetry.sdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-instrumentation-bom</artifactId>
+                <version>${opentelemetry.javaagent.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-instrumentation-bom-alpha</artifactId>
+                <version>${opentelemetry.javaagent.alpha.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
-
-        <!-- OpenTelemetry API -->
+        <!-- Main dependencies -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-api</artifactId>
-            <version>${otel.version}</version>
+            <artifactId>opentelemetry-sdk-extension-autoconfigure-spi</artifactId>
+            <scope>provided</scope>
         </dependency>
-
-        <!-- OpenTelemetry Instrumentation API -->
         <dependency>
             <groupId>io.opentelemetry.instrumentation</groupId>
             <artifactId>opentelemetry-instrumentation-api</artifactId>
-            <version>${otel.instrumentation.version}</version>
+            <scope>provided</scope>
         </dependency>
-
-        <!-- OpenTelemetry Javaagent Extension API -->
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-instrumentation-api-incubator</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>io.opentelemetry.javaagent</groupId>
             <artifactId>opentelemetry-javaagent-extension-api</artifactId>
-            <version>1.32.0-alpha</version>
-        </dependency>
-
-        <!-- ByteBuddy for instrumentation -->
-        <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy</artifactId>
-            <version>${byte-buddy.version}</version>
-        </dependency>
-
-        <!-- Auto-service for SPI -->
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service-annotations</artifactId>
-            <version>1.1.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
-            <version>1.1.1</version>
+            <version>${auto.service.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- OpenTelemetry API -->
-<!--        <dependency>-->
-<!--            <groupId>io.opentelemetry</groupId>-->
-<!--            <artifactId>opentelemetry-api</artifactId>-->
-<!--            <version>${opentelemetry.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-
-
-        <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
+            <version>${javax.servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- Jakarta Servlet API (for newer versions) -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>5.0.0</version>
-            <scope>provided</scope>
         </dependency>
-
-        <!-- SLF4J for logging -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>provided</scope>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang3.version}</version>
         </dependency>
+        <!-- Annotation processor for auto-service -->
 
         <!-- Test dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.databind.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <version>${protobuf.java.util.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.proto</groupId>
+            <artifactId>opentelemetry-proto</artifactId>
+            <version>${opentelemetry.proto.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.classic.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- The agent JAR for integration tests, usually handled differently in Maven -->
+        <!-- <dependency>
+            <groupId>io.opentelemetry.javaagent</groupId>
+            <artifactId>opentelemetry-javaagent</artifactId>
+            <version>${opentelemetry.javaagent.version}</version>
+            <scope>test</scope>
+        </dependency> -->
+        <!-- Codegen, muzzleBootstrap, muzzleTooling dependencies for build only -->
+        <dependency>
+            <groupId>io.opentelemetry.javaagent</groupId>
+            <artifactId>opentelemetry-javaagent-tooling</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-instrumentation-annotations-support</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
