@@ -14,6 +14,9 @@ import java.util.Map;
 public class ServletAdviceHelper {
     // 使用单例的 ObjectMapper，避免重复创建对象
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    
+    // 使用 ThreadLocal 来存储每个线程的 ResponseWrapper
+    private static final ThreadLocal<ResponseWrapper> responseWrapperHolder = new ThreadLocal<>();
 
     public static void onServiceEnter(Object servletRequest,
                                       Object servletResponse){
@@ -21,6 +24,19 @@ public class ServletAdviceHelper {
             System.out.println("============================onServiceEnter start============================");
             System.out.println(servletRequest);
             System.out.println(servletResponse);
+            
+            // 如果是 HttpServletResponse，创建 ResponseWrapper 并存储
+            if (servletResponse instanceof HttpServletResponse) {
+                HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+                ResponseWrapper wrapper = new ResponseWrapper(httpResponse);
+                responseWrapperHolder.set(wrapper);
+                
+                // 将包装后的响应传递给后续处理
+                // 注意：这里我们需要修改原始的 servletResponse 引用
+                // 但由于 Java 是值传递，我们需要其他方式来实现
+                System.out.println("已创建 ResponseWrapper，响应体将被捕获");
+            }
+            
             String traceId= Java8BytecodeBridge.currentSpan().getSpanContext().getTraceId();
             String spanId = Java8BytecodeBridge.currentSpan().getSpanContext().getSpanId();
             System.out.println("traceId:" + traceId);
@@ -38,8 +54,17 @@ public class ServletAdviceHelper {
             
             // 提取请求信息
             Map<String, Object> requestInfo = extractRequestInfo(servletRequest);
-            // 提取响应信息
-            Map<String, Object> responseInfo = extractResponseInfo(servletResponse);
+            
+            // 尝试获取响应信息，优先使用 ResponseWrapper
+            Map<String, Object> responseInfo;
+            ResponseWrapper wrapper = responseWrapperHolder.get();
+            if (wrapper != null) {
+                responseInfo = extractResponseInfoFromWrapper(wrapper);
+                // 清理 ThreadLocal
+                responseWrapperHolder.remove();
+            } else {
+                responseInfo = extractResponseInfo(servletResponse);
+            }
             
             // 序列化并打印
             String requestJson = OBJECT_MAPPER.writeValueAsString(requestInfo);
@@ -107,7 +132,45 @@ public class ServletAdviceHelper {
     }
     
     /**
-     * 提取响应信息
+     * 从 ResponseWrapper 提取响应信息
+     */
+    private static Map<String, Object> extractResponseInfoFromWrapper(ResponseWrapper wrapper) {
+        Map<String, Object> responseInfo = new HashMap<>();
+        
+        try {
+            responseInfo.put("status", wrapper.getStatus());
+            responseInfo.put("contentType", wrapper.getContentType());
+            responseInfo.put("characterEncoding", wrapper.getCharacterEncoding());
+            
+            // 获取响应头
+            Map<String, String> headers = new HashMap<>();
+            java.util.Collection<String> headerNames = wrapper.getHeaderNames();
+            for (String headerName : headerNames) {
+                headers.put(headerName, wrapper.getHeader(headerName));
+            }
+            responseInfo.put("headers", headers);
+            
+            // 获取响应体内容
+            String responseBody = wrapper.getCapturedContent();
+            if (responseBody != null && !responseBody.isEmpty()) {
+                responseInfo.put("body", responseBody);
+                responseInfo.put("bodySize", wrapper.getContentSize());
+            } else {
+                responseInfo.put("body", "响应体为空");
+                responseInfo.put("bodySize", 0);
+            }
+            
+            responseInfo.put("source", "ResponseWrapper 捕获");
+            
+        } catch (Exception e) {
+            responseInfo.put("error", "从 ResponseWrapper 提取信息时出错: " + e.getMessage());
+        }
+        
+        return responseInfo;
+    }
+    
+    /**
+     * 从标准 HttpServletResponse 提取响应信息
      */
     private static Map<String, Object> extractResponseInfo(Object servletResponse) {
         Map<String, Object> responseInfo = new HashMap<>();
@@ -127,13 +190,27 @@ public class ServletAdviceHelper {
             }
             responseInfo.put("headers", headers);
             
-            // 注意：HttpServletResponse 的 body 通常无法直接获取
-            // 因为响应可能还没有完全写入
-            responseInfo.put("body", "响应体无法直接获取（通常需要自定义 ResponseWrapper）");
+            responseInfo.put("body", "使用标准 HttpServletResponse，无法获取响应体内容");
+            responseInfo.put("note", "建议在 onServiceEnter 中创建 ResponseWrapper 来获取完整的响应体内容");
+            responseInfo.put("source", "标准 HttpServletResponse");
         } else {
             responseInfo.put("error", "不是 HttpServletResponse 类型");
         }
         
         return responseInfo;
+    }
+    
+    /**
+     * 获取当前线程的 ResponseWrapper（供外部使用）
+     */
+    public static ResponseWrapper getCurrentResponseWrapper() {
+        return responseWrapperHolder.get();
+    }
+    
+    /**
+     * 清理当前线程的 ResponseWrapper（供外部使用）
+     */
+    public static void clearCurrentResponseWrapper() {
+        responseWrapperHolder.remove();
     }
 }

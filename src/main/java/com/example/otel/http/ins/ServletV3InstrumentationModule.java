@@ -27,7 +27,8 @@ public final class ServletV3InstrumentationModule extends InstrumentationModule 
     @Override
     public List<String> getAdditionalHelperClassNames() {
         return Arrays.asList(
-                "com.example.otel.http.ins.ServletAdviceHelper"
+                "com.example.otel.http.ins.ServletAdviceHelper",
+                "com.example.otel.http.ins.ResponseWrapper"
         );
     }
     /*
