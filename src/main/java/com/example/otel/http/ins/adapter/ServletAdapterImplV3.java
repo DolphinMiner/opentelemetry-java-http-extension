@@ -9,6 +9,7 @@ import com.example.otel.http.ins.wrapper.CachedBodyResponseWrapperV3;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static com.example.otel.http.ins.adapter.ServletAdapterImplUtil.getUrlDecodeBytes;
@@ -94,6 +95,13 @@ public class ServletAdapterImplV3 implements ServletAdapter<HttpServletRequest, 
     @Override
     public byte[] getResponseBytes(HttpServletResponse httpServletResponse) {
         return ((CachedBodyResponseWrapperV3) httpServletResponse).getContentAsByteArray();
+    }
+
+    @Override
+    public void copyBodyToResponse(HttpServletResponse httpServletResponse) throws IOException {
+        if (httpServletResponse instanceof CachedBodyResponseWrapperV3) {
+            ((CachedBodyResponseWrapperV3) httpServletResponse).copyBodyToResponse();
+        }
     }
 
     @Override

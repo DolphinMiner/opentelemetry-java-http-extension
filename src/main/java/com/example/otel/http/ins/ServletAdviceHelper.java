@@ -87,6 +87,8 @@ public class ServletAdviceHelper {
             System.out.println("spanId:" + spanId);
             System.out.println("============================onServiceExit end============================");
 
+            // 还原response
+            adapter.copyBodyToResponse(httpServletResponse);
         } catch (Exception e) {
             System.out.println("序列化过程中出错: " + e.getMessage());
         }

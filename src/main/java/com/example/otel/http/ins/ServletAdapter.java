@@ -1,5 +1,7 @@
 package com.example.otel.http.ins;
 
+import java.io.IOException;
+
 public interface ServletAdapter<HttpServletRequest, HttpServletResponse> {
 
     HttpServletRequest asHttpServletRequest(Object servletRequest);
@@ -17,4 +19,7 @@ public interface ServletAdapter<HttpServletRequest, HttpServletResponse> {
     byte[] getRequestBytes(HttpServletRequest httpServletRequest);
 
     byte[] getResponseBytes(HttpServletResponse httpServletResponse);
+
+    void copyBodyToResponse(HttpServletResponse httpServletResponse) throws IOException;
+
 }
