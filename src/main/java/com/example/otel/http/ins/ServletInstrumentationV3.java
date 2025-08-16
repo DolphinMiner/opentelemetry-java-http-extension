@@ -11,6 +11,7 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,7 +49,7 @@ public class ServletInstrumentationV3 implements TypeInstrumentation {
     public static class Servlet3Advice {
 
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static void onEnter(@Advice.Argument(value = 0) ServletResponse request,
+        public static void onEnter(@Advice.Argument(value = 0) ServletRequest request,
                                    @Advice.Argument(value = 1) ServletResponse response) {
             ServletAdviceHelper.onServiceEnter(request, response);
 //            if (!(response instanceof HttpServletResponse)) {
@@ -61,8 +62,8 @@ public class ServletInstrumentationV3 implements TypeInstrumentation {
         }
 
         @Advice.OnMethodExit(suppress = Throwable.class)
-        public static void onExit(@Advice.Argument(value = 0, readOnly = false) HttpServletRequest request,
-                                  @Advice.Argument(value = 1, readOnly = false) HttpServletResponse response) {
+        public static void onExit(@Advice.Argument(value = 0, readOnly = false) ServletRequest request,
+                                  @Advice.Argument(value = 1, readOnly = false) ServletResponse response) {
             ServletAdviceHelper.onServiceExit(request, response);
         }
     }
