@@ -1,9 +1,9 @@
 package com.example.otel.http.ins;
 
+import com.example.otel.http.ins.adapter.ServletAdapterImplV3;
+import com.example.otel.http.ins.util.Pair;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
-import io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers;
-
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -11,6 +11,8 @@ import net.bytebuddy.matcher.ElementMatchers;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.namedOneOf;
@@ -47,15 +49,28 @@ public class ServletInstrumentationV3 implements TypeInstrumentation {
     public static class Servlet3Advice {
 
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static void onEnter(@Advice.Argument(value = 0) ServletRequest request,
-                                   @Advice.Argument(value = 1) ServletResponse response) {
-            ServletAdviceHelper.onServiceEnter(request, response);
+        public static void onEnter(@Advice.Argument(value = 0, readOnly = false) ServletRequest request,
+                                   @Advice.Argument(value = 1, readOnly = false) ServletResponse response) {
+            Pair<HttpServletRequest, HttpServletResponse> pair =
+                    ServletAdviceHelper.onServiceEnter(ServletAdapterImplV3.getInstance(), request, response);
+
+            if (pair == null) {
+                return;
+            }
+
+            if (pair.getFirst() != null) {
+                request = pair.getFirst();
+            }
+
+            if (pair.getSecond() != null) {
+                response = pair.getSecond();
+            }
         }
 
         @Advice.OnMethodExit(suppress = Throwable.class)
         public static void onExit(@Advice.Argument(value = 0, readOnly = false) ServletRequest request,
                                   @Advice.Argument(value = 1, readOnly = false) ServletResponse response) {
-            ServletAdviceHelper.onServiceExit(request, response);
+             ServletAdviceHelper.onServiceExit(ServletAdapterImplV3.getInstance(), request, response);
         }
     }
 }

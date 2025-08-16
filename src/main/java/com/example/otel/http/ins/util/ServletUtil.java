@@ -1,0 +1,77 @@
+package com.example.otel.http.ins.util;
+
+
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
+import java.util.*;
+
+public class ServletUtil {
+
+    private ServletUtil() {
+    }
+
+    public static String appendUri(String uri, String name, String value) {
+        return UriComponentsBuilder.fromUriString(uri).queryParam(name, value).build().toString();
+    }
+
+    public static String getRequestPath(String uri) {
+        try {
+            URI oldUri = URI.create(uri);
+            if (StringUtil.isEmpty(oldUri.getQuery())) {
+                return oldUri.getPath();
+            } else {
+                return new StringBuilder(oldUri.getPath()).append('?').append(oldUri.getQuery()).toString();
+            }
+        } catch (Exception e) {
+            return uri;
+        }
+    }
+
+    /**
+     * match requset params
+     *
+     * @param requestParams
+     * @param name
+     * @param value
+     * @return
+     */
+    public static boolean matchAndRemoveRequestParams(Map<String, List<String>> requestParams, String name, String value) {
+        if (MapUtils.isEmpty(requestParams)) {
+            return false;
+        }
+        List<String> values = requestParams.get(name);
+        if(CollectionUtil.isEmpty(values)){
+            return false;
+        }
+        Iterator<String> iterator = values.iterator();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            if (StringUtil.equals(next, value)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * obtain requset params
+     *
+     * @param queryString
+     * @return
+     */
+    public static Map<String, List<String>> getRequestParams(String queryString) {
+        if (StringUtil.isEmpty(queryString)) {
+            return Collections.emptyMap();
+        }
+        MultiValueMap<String, String> paramsKeyValueMap = UriComponentsBuilder.fromUriString(
+            "?" + queryString).build().getQueryParams();
+        Map<String, List<String>> requestParamsMap = new HashMap<>();
+        for (Map.Entry<String, List<String>> entry : paramsKeyValueMap.entrySet()) {
+            requestParamsMap.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
+        return requestParamsMap;
+    }
+}
