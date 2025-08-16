@@ -50,13 +50,6 @@ public class ServletInstrumentationV3 implements TypeInstrumentation {
         public static void onEnter(@Advice.Argument(value = 0) ServletRequest request,
                                    @Advice.Argument(value = 1) ServletResponse response) {
             ServletAdviceHelper.onServiceEnter(request, response);
-//            if (!(response instanceof HttpServletResponse)) {
-//                return;
-//            }
-//
-//            HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-//            if (!httpServletResponse.containsHeader("X-server-id")) {
-//            }
         }
 
         @Advice.OnMethodExit(suppress = Throwable.class)
