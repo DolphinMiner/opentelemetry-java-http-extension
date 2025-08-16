@@ -12,6 +12,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.namedOneOf;
 
 /**
@@ -23,20 +24,21 @@ import static net.bytebuddy.matcher.ElementMatchers.namedOneOf;
 public class ServletInstrumentationV3 implements TypeInstrumentation {
     @Override
     public ElementMatcher<TypeDescription> typeMatcher() {
-        return AgentElementMatchers.hasSuperType(
-                namedOneOf("javax.servlet.Filter", "javax.servlet.http.HttpServlet"));
+//        return AgentElementMatchers.hasSuperType(
+//                namedOneOf("javax.servlet.http.HttpServlet"));
+        return named("javax.servlet.http.HttpServlet");
     }
 
     @Override
     public void transform(TypeTransformer typeTransformer) {
         typeTransformer.applyAdviceToMethod(
-                namedOneOf("doFilter", "service")
+                namedOneOf( "service")
                         .and(
                                 ElementMatchers.takesArgument(
-                                        0, ElementMatchers.named("javax.servlet.ServletRequest")))
+                                        0, named("javax.servlet.ServletRequest")))
                         .and(
                                 ElementMatchers.takesArgument(
-                                        1, ElementMatchers.named("javax.servlet.ServletResponse")))
+                                        1, named("javax.servlet.ServletResponse")))
                         .and(ElementMatchers.isPublic()),
                 this.getClass().getName() + "$Servlet3Advice");
     }
