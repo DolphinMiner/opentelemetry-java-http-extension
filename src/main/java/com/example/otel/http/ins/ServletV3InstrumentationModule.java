@@ -6,7 +6,12 @@ import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers;
+
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import io.opentelemetry.javaagent.tooling.HelperInjector;
 import net.bytebuddy.matcher.ElementMatcher;
 
 /**
@@ -19,6 +24,12 @@ public final class ServletV3InstrumentationModule extends InstrumentationModule 
         super("servlet-v3", "servlet-3");
     }
 
+    @Override
+    public List<String> getAdditionalHelperClassNames() {
+        return Arrays.asList(
+                "com.example.otel.http.ins.ServletAdviceHelper"
+        );
+    }
     /*
     We want this instrumentation to be applied after the standard servlet instrumentation.
     The latter creates a server span around http request.

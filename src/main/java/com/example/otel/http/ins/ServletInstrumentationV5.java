@@ -1,6 +1,5 @@
 package com.example.otel.http.ins;
 
-import com.example.otel.http.ins.util.ServletAdviceHelper;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
 import io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers;

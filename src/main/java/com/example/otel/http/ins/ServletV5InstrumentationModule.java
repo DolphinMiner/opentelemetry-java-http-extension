@@ -6,6 +6,7 @@ import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers;
 import net.bytebuddy.matcher.ElementMatcher;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -19,7 +20,12 @@ public final class ServletV5InstrumentationModule extends InstrumentationModule 
     public ServletV5InstrumentationModule() {
         super("servlet-v5", "servlet-3");
     }
-
+    @Override
+    public List<String> getAdditionalHelperClassNames() {
+        return Arrays.asList(
+                "com.example.otel.http.ins.ServletAdviceHelper"
+        );
+    }
     /*
     We want this instrumentation to be applied after the standard servlet instrumentation.
     The latter creates a server span around http request.

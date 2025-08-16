@@ -1,4 +1,4 @@
-package com.example.otel.http.ins.util;
+package com.example.otel.http.ins;
 
 public class ServletAdviceHelper {
 

@@ -204,18 +204,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Premain-Class>com.example.otel.http.HttpCaptureAgent</Premain-Class>
-                            <Agent-Class>com.example.otel.http.HttpCaptureAgent</Agent-Class>
-                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
-                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                            <Implementation-Title>${project.name}</Implementation-Title>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -240,18 +228,6 @@
                                     </excludes>
                                 </filter>
                             </filters>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <manifestEntries>
-                                        <Premain-Class>com.example.otel.http.HttpCaptureAgent</Premain-Class>
-                                        <Agent-Class>com.example.otel.http.HttpCaptureAgent</Agent-Class>
-                                        <Can-Redefine-Classes>true</Can-Redefine-Classes>
-                                        <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                                        <Implementation-Title>${project.name}</Implementation-Title>
-                                        <Implementation-Version>${project.version}</Implementation-Version>
-                                    </manifestEntries>
-                                </transformer>
-                            </transformers>
                         </configuration>
                     </execution>
                 </executions>

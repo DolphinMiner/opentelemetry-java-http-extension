@@ -1,7 +1,5 @@
 package com.example.otel.http.ins;
 
-import com.example.otel.http.ins.util.ServletAdviceHelper;
-import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
 import io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers;
@@ -13,8 +11,6 @@ import net.bytebuddy.matcher.ElementMatchers;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import static net.bytebuddy.matcher.ElementMatchers.namedOneOf;
 
